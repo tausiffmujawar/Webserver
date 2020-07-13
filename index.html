@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Page Title</title>
+    <script>
+        function startFunc() {
+            var xmlhttp = new XMLHttpRequest();
+
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                    if (xmlhttp.status == 200) {
+                        // document.getElementById("myDiv").innerHTML = xmlhttp.responseText;
+                    }
+                    else if (xmlhttp.status == 400) {
+                        alert('There was an error 400');
+                    }
+                    else {
+                        alert('something else other than 200 was returned');
+                    }
+                }
+            };
+
+            xmlhttp.open("GET", "http://localhost:8080/start", true);
+            xmlhttp.send();
+        }
+
+        function stopFunc() {
+            alert('stop called');
+        }
+
+        function downloadFunc() {
+            var data = [
+                ['Foo', 'programmer'],
+                ['Bar', 'bus driver'],
+                ['Moo', 'Reindeer Hunter']
+            ];
+            var csv = 'Name,Title\n';
+            data.forEach(function (row) {
+                csv += row.join(',');
+                csv += "\n";
+            });
+
+            var hiddenElement = document.createElement('a');
+            hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+            hiddenElement.target = '_blank';
+            hiddenElement.download = 'test.csv';
+            hiddenElement.click();
+        };
+
+
+    </script>
+</head>
+
+<body>
+    <h1>Hello World</h1>
+    <button onclick="startFunc()">start</button>
+    <button onclick="stopFunc()">stop</button>
+    <button onclick="downloadFunc()">download</button>
+</body>
+
+</html>
