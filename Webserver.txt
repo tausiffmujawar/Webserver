@@ -1,0 +1,83 @@
+#include<string>
+#include<iostream>
+#include<sstream>
+#include<fstream>
+#include<istream>
+#include<streambuf>
+#include<iterator>
+#include<vector>
+#include "WebServer.h"
+#include <map>
+using namespace std;
+
+#pragma comment(lib,"ws2_32.lib")
+
+
+void WebServer::onClientConnected(int clientSocket) {
+}
+void WebServer::onClientDisconnected(int clientSocket) {}
+void WebServer::onMessageRecieved(int clientSocket, const char* msg, int length) {
+
+	map<string, int> beacons;
+
+	// insert elements in random order 
+	beacons.insert(pair<string, int>("abc123", 40));
+	beacons.insert(pair<string, int>("abc345", 30));
+	beacons.insert(pair<string, int>("abc678", 0));
+	beacons.insert(pair<string, int>("abc910", 20));
+	beacons.insert(pair<string, int>("abc234", 50));
+	beacons.insert(pair<string, int>("abc567", 50));
+
+	std::istringstream iss(msg);
+	std::vector<std::string> parsed((std::istream_iterator<std::string>(iss)), std::istream_iterator<std::string>());
+
+	std::string content = "<h1>404 Not Found</h1>";
+	int size = 0;
+	int errorCode = 404;
+
+	if (parsed.size() >= 3 && parsed[0] == "GET" && parsed[1] != "/start") {
+		std::ifstream f(".\\wwwroot" + parsed[1]);
+		if (f.good())
+		{
+			std::string str((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
+			content = str;
+			errorCode = 200;
+		}
+		f.close();
+		std::ostringstream oss;	
+		oss << "HTTP/1.1 " << errorCode << " OK\r\n";
+		oss << "Cache-Control: no-cache, private\r\n";
+		oss << "Content-Type : text/html\r\n";
+		oss << "Content-Length: " << content.size() << "\r\n";
+		oss << "\r\n";
+		oss << content;
+
+		std::string output = oss.str();
+		size = output.size() + 1;
+
+		sendToClient(clientSocket, output.c_str(), size);
+	}
+
+	if (parsed[1] == "/start") {
+		std::ostringstream oss;
+		errorCode = 200;
+		oss << "HTTP/1.1 " << errorCode << " OK\r\n";
+		oss << "Cache-Control: no-cache, private\r\n";
+		oss << "Content-Type : text/plain\r\n";
+		string str;
+		for (auto it = beacons.begin(); it != beacons.end(); ++it)
+		{
+			str = str + it->first + ":" + to_string(it->second) + ",";			
+		}			
+		oss << "Content-Length: " << str.size()-1 << "\r\n";
+		oss << "\r\n";
+		oss << str.substr(0, str.size()-1);
+		std::string output = oss.str();
+		size = output.size() + 1;
+
+		sendToClient(clientSocket, output.c_str(), size);
+	
+	}
+
+	
+}

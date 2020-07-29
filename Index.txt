@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Page Title</title>
+    <style>
+        body {
+            background-color: #5f5954;
+            font-family: calibri;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 40px;
+            color: #fff;
+        }
+
+
+        hr {
+            border-top: 2px solid #333333;
+            border-bottom: 2px solid #333333;
+            margin: 2%;
+        }
+
+        .inline {
+            display: flex;
+        }
+
+        .container-1 {
+            margin-left: 10%;
+            width: 35%;
+            margin-top: 5%;
+        }
+
+        .container-2 {
+            margin-left: 5%;
+            width: 50%;
+        }
+
+        .container-text,
+        h2 {
+            font-size: 30px;
+            color: #fff;
+        }
+
+        .inner-container {
+            width: 40%;
+            text-align: center;
+            margin-top: 25%;
+        }
+
+        .btn-main {
+            padding: 30px 15px;
+            min-width: 18em;
+            font-size: 20px;
+            background-color: #e1e0e0;
+            cursor: pointer;
+            margin: 3%;
+            border-radius: 5px;
+        }
+
+        .btn-main:hover,
+        .btn-main:focus {
+            background-color: #ffc324;
+            border-color: #000;
+        }
+
+        .show {
+            display: block;
+        }
+
+        .text-center>h2 {
+            margin-left: 10%;
+
+        }
+
+        .hide {
+            display: none;
+        }
+
+        ul {
+            list-style-type: none;
+            width: 26em;
+            max-height: 430px;
+            overflow-y: scroll;
+        }
+
+        li:first-child {
+            margin-top: 0;
+        }
+
+        li:last-child {
+            margin-bottom: 0;
+        }
+
+        li {
+            padding: 25px 15px;
+            width: 18em;
+            font-size: 20px;
+            background-color: #e1e0e0;
+            cursor: pointer;
+            margin: 3% 0;
+            border-radius: 2px;
+        }
+
+        .circle {
+            background-color: #151414;
+            width: 10px;
+            height: 10px;
+            padding: 1px 6px;
+            margin-left: 5px;
+            border-radius: 50%;
+        }
+
+        .enabled {
+            color: #04ef0b;
+        }
+
+        .disabled {
+            color: #ef3304;
+        }
+
+        .disabled:after {
+            border-bottom: 2px solid #ef3304;
+            transform: rotate(135deg);
+            width: 24px;
+            /* content: ""; */
+            position: absolute;
+            margin-top: 12px;
+            margin-left: -17px;
+        }
+
+        .signal {
+            width: .3rem;
+            height: 2.2rem;
+            background: #000;
+            position: relative;
+            top: 12rem;
+            left: 15rem;
+            box-shadow: 1rem -.7rem 0 0, 1.6rem -1.3rem 0 0, 2.2rem -1.8rem 0 0, 2.8rem -2.2rem 0 0;
+        }
+
+        .signal:before {
+            position: absolute;
+            content: "";
+            display: block;
+            width: 6rem;
+            height: 2.2rem;
+            background: #e1e0e0;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0.5em;
+        }
+
+        ::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #ffc324;
+            outline: 1px solid slategrey;
+        }
+    </style>
+
+    <script>
+
+        function startFunc(e) {
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function () {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                    if (xmlhttp.status == 200) {
+                        showBeacons(xmlhttp.response);
+                    }
+                    else if (xmlhttp.status == 400) {
+                        debugger;
+                    }
+                    else {
+                        debugger;
+                    }
+                }
+            };
+
+            xmlhttp.open("GET", "http://localhost:8080/start", true);
+            xmlhttp.send();
+        }
+
+        function showBeacons(dataFromServer) {
+            var beacons = dataFromServer.split(",");
+            var ele = document.getElementsByClassName("beacons")[0];
+            ele.className = ele.className.replace(/\bhide\b/g, "show");
+
+
+            var elem = document.getElementsByClassName("no-beacons")[0];
+            elem.className = elem.className.replace(/\bshow\b/g, "hide");
+
+            if (document.getElementsByTagName("ul").length == 0) {
+                var list = document.createElement("ul");
+                for (var i in beacons) {
+                    var keyValue = beacons[i].split(":");
+                    var anchor = document.createElement("span");
+                    var bluClass = parseInt(keyValue[1]) > 0 ? 'circle enabled' : 'circle disabled'
+                    anchor.innerHTML = keyValue[0] + "<span class='" + bluClass + "'>B</span> ";
+
+                    var elem = document.createElement("li");
+                    elem.appendChild(anchor);
+                    list.appendChild(elem);
+                }
+                ele.appendChild(list);
+            }
+        }
+
+
+        function stopFunc() {
+            alert('stop called');
+        }
+
+        function downloadFunc() {
+            var data = [
+                ['Foo', 'programmer'],
+                ['Bar', 'bus driver'],
+                ['Moo', 'Reindeer Hunter']
+            ];
+            var csv = 'Name,Title\n';
+            data.forEach(function (row) {
+                csv += row.join(',');
+                csv += "\n";
+            });
+
+            var hiddenElement = document.createElement('a');
+            hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+            hiddenElement.target = '_blank';
+            hiddenElement.download = 'test.csv';
+            hiddenElement.click();
+        };
+
+
+    </script>
+</head>
+
+<body>
+    <h1>Beacon Scanner App</h1>
+    <hr>
+    <div class="inline">
+        <div class="container-1">
+            <div>
+                <button class="btn-main" onclick="startFunc()">Show Beacon near me</button>
+            </div>
+            <div>
+                <button class="btn-main" onclick="stopFunc()">Start Logging Beacon Details</button>
+            </div>
+            <div>
+                <button class="btn-main" onclick="downloadFunc()">Download Beacon Logs</button>
+            </div>
+        </div>
+        <div class="container-2">
+            <div class="no-beacons show">
+                <div class="inner-container">
+                    <span class="container-text">Engine must be ON to scan for Beacons</span>
+                </div>
+            </div>
+            <div class="beacons hide text-center">
+                <h2>Beacons in Vicinity</h2>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
